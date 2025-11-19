@@ -22,7 +22,7 @@ reload_sound.set_volume(1.0)
 # --- Player setup ---
 player_x, player_y = 50, 150
 player_speed = 10
-player_health = 100
+player_health = 10
 
 # --- Enemy setup ---
 enemy_group = []         
