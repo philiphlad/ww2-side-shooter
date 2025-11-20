@@ -22,11 +22,11 @@ reload_sound.set_volume(1.0)
 # --- Player setup ---
 player_x, player_y = 50, 150
 player_speed = 10
-player_health = 10
+player_health = 100
 
 # --- Enemy setup ---
 enemy_group = []         
-enemy_speeds = []        
+enemy_speeds = []       
 enemy_healths = []       
 enemy_collision_cooldowns = []  
 
@@ -64,8 +64,6 @@ last_shot = 0
 space_pressed = False
 bullets = []
 enemy_shooting = False
-if enemy_shooting:
-    print('Test')
 
 
 # --- Colors & Fonts ---
@@ -77,6 +75,7 @@ font_big = pygame.font.SysFont(None, 72)
 running = True
 paused = False
 score = 0
+
 
 # --- Game loop ---
 while running:
@@ -134,7 +133,6 @@ while running:
 
         enemy_rect = pygame.Rect(ex, ey, 120, 120)
 
-        # Enemy view box (INVISIBLE)
         view_rect = pygame.Rect(ex - VIEW_LENGTH, ey, VIEW_LENGTH, 120)
 
         # Player inside vision = stop
@@ -163,16 +161,9 @@ while running:
                     enemy_healths.pop(i)
                     enemy_collision_cooldowns.pop(i)
                     score += 1
+                if bullet_rect.colliderect(player_rect):
+                    player_health -= 10
                 break
-
-    # --- Enemy collision with player ---
-    for i in range(len(enemy_group)):
-        enemy_rect = pygame.Rect(enemy_group[i][0], enemy_group[i][1], 120, 120)
-        if enemy_rect.colliderect(player_rect):
-            if enemy_collision_cooldowns[i] <= 0:
-                player_health -= 5
-                enemy_collision_cooldowns[i] = 1000
-        enemy_collision_cooldowns[i] -= dt
 
     # --- Next wave ---
     if len(enemy_group) == 0:
@@ -182,6 +173,7 @@ while running:
     if is_reloading and current_time - reload_start >= RELOAD_TIME:
         ammo = 10
         is_reloading = False
+
 
     # --- Update bullets ---
     bullets = [[b[0] + 20, b[1]] for b in bullets if b[0] < WIDTH]
@@ -206,6 +198,7 @@ while running:
         screen.blit(font_small.render("Reloading...", True, (255, 255, 255)), (420, 5))
     score_text = font_small.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_text, (WIDTH - score_text.get_width() - 10, 5))
+        
 
     pygame.display.flip()
     clock.tick(FPS)
