@@ -22,7 +22,8 @@ reload_sound.set_volume(1.0)
 # --- Player setup ---
 player_x, player_y = 50, 150
 player_speed = 10
-player_health = 100
+player_health = 200
+lives = 3
 
 # --- Enemy setup ---
 enemy_group = []
@@ -78,7 +79,6 @@ font_big = pygame.font.SysFont(None, 72)
 running = True
 paused = False
 score = 0
-
 
 # --- Game loop ---
 while running:
@@ -218,6 +218,8 @@ while running:
         screen.blit(font_small.render("Reloading...", True, (255, 255, 255)), (420, 5))
     score_text = font_small.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_text, (WIDTH - score_text.get_width() - 10, 5))
+
+    lives_text = font_small.render(f"Lives: {lives}", True, (255, 255, 255))
         
 
     pygame.display.flip()
