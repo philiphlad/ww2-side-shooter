@@ -6,7 +6,7 @@ pygame.init()
 # --- Window setup ---
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("2D Shooter Game")
+pygame.display.set_caption("Dunkirk evacuation - ww2")
 clock = pygame.time.Clock()
 FPS = 60
 
@@ -25,10 +25,11 @@ player_speed = 10
 player_health = 100
 
 # --- Enemy setup ---
-enemy_group = []         
-enemy_speeds = []       
-enemy_healths = []       
-enemy_collision_cooldowns = []  
+enemy_group = []
+enemy_speeds = []
+enemy_healths = []
+enemy_collision_cooldowns = []
+enemy_last_shot = []
 
 def spawn_wave():
     count = random.randint(3, 5)
@@ -51,6 +52,7 @@ def spawn_wave():
             health = 3
         enemy_healths.append(health)
         enemy_collision_cooldowns.append(0)
+        enemy_last_shot.append(0)
 
 spawn_wave()
 
@@ -63,7 +65,8 @@ SHOT_COOLDOWN = 250
 last_shot = 0
 space_pressed = False
 bullets = []
-enemy_shooting = False
+enemy_bullets = []
+ENEMY_SHOT_COOLDOWN = 1000
 
 
 # --- Colors & Fonts ---
@@ -135,10 +138,14 @@ while running:
 
         view_rect = pygame.Rect(ex - VIEW_LENGTH, ey, VIEW_LENGTH, 120)
 
-        # Player inside vision = stop
-        if not view_rect.colliderect(player_rect):
+        # Player inside vision = stop and shoot
+        if view_rect.colliderect(player_rect):
+            if current_time - enemy_last_shot[i] > ENEMY_SHOT_COOLDOWN:
+                enemy_bullets.append([ex, ey + -5]) # Adjust y to be center of enemy
+                enemy_last_shot[i] = current_time
+        else:
             enemy_group[i][0] -= enemy_speeds[i]
-            enemy_shooting = True
+
 
         # Remove enemy if fully off screen
         if enemy_group[i][0] < -120:
@@ -146,6 +153,7 @@ while running:
             enemy_speeds.pop(i)
             enemy_healths.pop(i)
             enemy_collision_cooldowns.pop(i)
+            enemy_last_shot.pop(i)
 
     # --- Bullet collision ---
     for i in range(len(enemy_group)-1, -1, -1):
@@ -177,6 +185,15 @@ while running:
 
     # --- Update bullets ---
     bullets = [[b[0] + 20, b[1]] for b in bullets if b[0] < WIDTH]
+    enemy_bullets = [[b[0] - 15, b[1]] for b in enemy_bullets if b[0] > 0]
+
+    # --- Enemy bullet collision ---
+    for bullet in enemy_bullets[:]:
+        bullet_rect = pygame.Rect(bullet[0], bullet[1], 20, 10)
+        if player_rect.colliderect(bullet_rect):
+            player_health -= 10
+            enemy_bullets.remove(bullet)
+
 
     # --- Draw everything ---
     screen.fill(GREEN)
@@ -187,6 +204,9 @@ while running:
         screen.blit(enemy_img, (enemy[0], enemy[1]))
 
     for b in bullets:
+        screen.blit(bullet_img, b)
+
+    for b in enemy_bullets:
         screen.blit(bullet_img, b)
 
     pygame.draw.rect(screen, (255, 0, 0), (5, 5, 200, 25))
