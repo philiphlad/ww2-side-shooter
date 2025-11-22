@@ -24,6 +24,7 @@ player_x, player_y = 50, 150
 player_speed = 10
 player_health = 100
 lives = 3
+score = 0
 
 # --- Enemy setup ---
 enemy_group = []
@@ -33,7 +34,7 @@ enemy_collision_cooldowns = []
 enemy_last_shot = []
 
 def spawn_wave():
-    count = random.randint(3, 5)
+    count = random.randint(1, 3)
     for i in range(count):
         attempts = 0
         y_pos = random.randint(50, HEIGHT - 150)
@@ -226,6 +227,7 @@ while running:
     screen.blit(score_text, (WIDTH - score_text.get_width() - 10, 5))
 
     lives_text = font_small.render(f"Lives: {lives}", True, (255, 255, 255))
+    screen.blit(lives_text, (WIDTH - lives_text.get_width() - 10, 520))
         
 
     pygame.display.flip()
